@@ -33,17 +33,26 @@ defmodule Genetic do
 
     #Find elite of population
     filtered_list = elite(population, 10)
-    best = elem(filtered_list, 0)
-    the_rest = elem(filtered_list, 1)
+    best = Enum.into(elem(filtered_list, 0), %{})
+    the_rest = Enum.into(elem(filtered_list, 1), %{})
     #Randomly crossover(80%) or mutate(20%) the rest
-    random = :random.uniform(100)
-    if random >= 80 do
-      #cross_over(the_rest)
-    else
-      #mutate(the_rest)
-    end
+    population = %{}
+    population = Map.merge(population, best)
+    population = Map.merge(population, handle_the_rest(the_rest))
 
     breed(population, target, threshold, max_generations-1)
+  end
+
+  def handle_the_rest(population) do
+    processed = Parallel.pmap(population, fn(x) ->
+      random = :random.uniform(100)
+      if random >= 80 do
+        cross_over(the_rest)
+      else
+        mutate(the_rest)
+      end
+    end)
+    Enum.into(processed, %{})
   end
 
   def elite(population, amount) do
@@ -90,13 +99,8 @@ defmodule Genetic do
   end
 
   def mutate(input) do
-    random = :random.uniform(100)
-    if random >= 80 do
-      random = :random.uniform(String.length(input)-1)
-      String.replace(input, String.at(input, random), Random.letter(), global: false)
-    else
-      input
-    end
+    random = :random.uniform(String.length(input)-1)
+    String.replace(input, String.at(input, random), Random.letter(), global: false)
   end
 
   # Evaluate the fitness of the possible solution
