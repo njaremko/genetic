@@ -32,13 +32,15 @@ defmodule Genetic do
     #population = Map.merge(population, x)
 
     #Find elite of population
-    best = elite(population, 10)
+    filtered_list = elite(population, 10)
+    best = elem(filtered_list, 0)
+    the_rest = elem(filtered_list, 1)
     #Randomly crossover(80%) or mutate(20%) the rest
     random = :random.uniform(100)
     if random >= 80 do
-      #cross_over()
+      #cross_over(the_rest)
     else
-      #mutate()
+      #mutate(the_rest)
     end
 
     breed(population, target, threshold, max_generations-1)
