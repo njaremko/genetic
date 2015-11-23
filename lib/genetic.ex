@@ -47,7 +47,8 @@ defmodule Genetic do
   def elite(population, amount) do
     # Given a population, and an amount of chromosomes.
     # Return that many best chromosomes.
-    Enum.slice(List.keysort(population, 1), 0..amount-1)
+    x = List.keysort(population, 1)
+    {Enum.slice(x, 0..amount-1), Enum.slice(x, amount..length(x)-1)}
   end
 
   def select_fitter_mate(parent1, parent2) do
@@ -124,5 +125,5 @@ end
 
 #Genetic.start("Hello World", 100,  100)
 #Genetic.fitness("heRlo World", "Hello World",  100)
-IO.puts Genetic.elite([{"test", 10}, {"testing", 5}, {"this", 15}, {"te", 1}], 3)
+#IO.puts Genetic.elite([{"test", 10}, {"testing", 5}, {"this", 15}, {"te", 1}, {"monkey", 3}], 3)
 
