@@ -22,15 +22,6 @@ defmodule Genetic do
   def breed(_, _, _, max_generations \\ 30000)
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
-    #{parent1, parent2} = selection_process(population)
-
-    # If elite, passthrough. Randomly crossover or mutate.
-    #x = cross_over(parent1, parent2) |> assess(target, threshold)a
-
-    #population = Map.delete(population, parent1)
-    #population = Map.delete(population, parent2)
-    #population = Map.merge(population, x)
-
     #Find elite of population
     filtered_list = elite(population, 10)
     best = Enum.into(elem(filtered_list, 0), %{})
