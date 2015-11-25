@@ -31,7 +31,7 @@ defmodule Genetic do
   end
 
   def handle_the_rest(population, target, threshold) do
-    processed = Parallel.pmap(population, fn(x) ->
+    Parallel.pmap(population, fn(x) ->
       x = elem(x,0)
       random = :random.uniform(100)
       if random >= 80 do
@@ -135,7 +135,5 @@ defmodule Genetic do
   end
 end
 
-Genetic.start("Hello World", 100, 80)
-#Genetic.fitness("heRlo World", "Hello World",  100)
-#IO.puts Genetic.elite([{"test", 10}, {"testing", 5}, {"this", 15}, {"te", 1}, {"monkey", 3}], 3)
+Genetic.start("Hello World", 100, 50)
 
