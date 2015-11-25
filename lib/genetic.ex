@@ -19,32 +19,53 @@ defmodule Genetic do
     Enum.into(x, %{})
   end
 
-  def breed(_, _, _, max_generations \\ 30000)
+  def breed(_, _, _, max_generations \\ 200000)
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
     #Find elite of population
+
+    population = Enum.into(population, [])
     filtered_list = elite(population, 10)
     best = Enum.into(elem(filtered_list, 0), %{})
     the_rest = Enum.into(elem(filtered_list, 1), %{})
     #Randomly crossover(80%) or mutate(20%) the rest
     population = %{}
     population = Map.merge(population, best)
-    population = Map.merge(population, handle_the_rest(the_rest))
-
+    population = Map.merge(population, handle_the_rest(the_rest, target, threshold))
     breed(population, target, threshold, max_generations-1)
   end
 
-  def handle_the_rest(population) do
+  def handle_the_rest(population, target, threshold) do
     processed = Parallel.pmap(population, fn(x) ->
+      x = elem(x,0)
       random = :random.uniform(100)
       if random >= 80 do
-        cross_over(the_rest)
+        mutate(x)
       else
-        mutate(the_rest)
+        x
       end
     end)
+    |> cross_over_helper |> assess(target, threshold) #|> IO.puts
     Enum.into(processed, %{})
   end
+  def cross_over_helper(_, current \\ [])
+  def cross_over_helper([head|tail], current) do
+    random = :random.uniform(100)
+      if random <= 80 do
+        if tail != [] do
+          List.insert_at(current, 0, cross_over(head, hd(tail)))
+          current =
+          cross_over_helper(tl(tail), current)
+        else
+          current = List.insert_at(current, 0, head)
+          cross_over_helper(tail, current)
+        end
+      else
+        current = List.insert_at(current, 0, head)
+        cross_over_helper(tail, current)
+      end
+  end
+  def cross_over_helper([], result), do: result
 
   def elite(population, amount) do
     # Given a population, and an amount of chromosomes.
@@ -65,8 +86,8 @@ defmodule Genetic do
 
   def cross_over(parent1, parent2) do
     # Defines how genes are passed to next generation
-    parent1 = elem(parent1,0)
-    parent2 = elem(parent2,0)
+    #parent1 = elem(parent1, 0)
+    #parent2 = elem(parent2, 0)
     len = String.length(parent1)
     rand = :random.uniform(len)
 
@@ -76,7 +97,7 @@ defmodule Genetic do
     first2 = String.slice(parent2, 0..rand)
     last2 = String.slice(parent2, rand+1..len)
 
-    [mutate(first1 <> last2), mutate(first2 <> last1)]
+    [first1 <> last2, first2 <> last1]
   end
 
   def selection_process(population) do
@@ -120,7 +141,7 @@ defmodule Genetic do
   end
 end
 
-#Genetic.start("Hello World", 100,  100)
+Genetic.start("Hello World", 100, 100)
 #Genetic.fitness("heRlo World", "Hello World",  100)
 #IO.puts Genetic.elite([{"test", 10}, {"testing", 5}, {"this", 15}, {"te", 1}, {"monkey", 3}], 3)
 
