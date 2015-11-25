@@ -15,15 +15,14 @@ defmodule Genetic do
   end
 
   def assess(chromosomes, target, threshold) do
-    x = Parallel.pmap(chromosomes, fn(x) -> {x, fitness(x, target, threshold)} end)
-    Enum.into(x, %{})
+    Parallel.pmap(chromosomes, fn(x) -> {x, fitness(x, target, threshold)} end)
+    |> Enum.into(%{})
   end
 
   def breed(_, _, _, max_generations \\ 200000)
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
     #Find elite of population
-
     population = Enum.into(population, [])
     filtered_list = elite(population, 10)
     best = Enum.into(elem(filtered_list, 0), %{})
@@ -45,7 +44,7 @@ defmodule Genetic do
         x
       end
     end)
-    |> cross_over_helper |> assess(target, threshold) #|> IO.puts
+    |> cross_over_helper |> assess(target, threshold)
     Enum.into(processed, %{})
   end
   def cross_over_helper(_, current \\ [])
@@ -53,8 +52,9 @@ defmodule Genetic do
     random = :random.uniform(100)
       if random <= 80 do
         if tail != [] do
-          List.insert_at(current, 0, cross_over(head, hd(tail)))
-          current =
+          {child1, child2} = hd(List.insert_at(current, 0, cross_over(head, hd(tail))))
+          current = List.insert_at(current, 0, child1)
+          current = List.insert_at(current, 0, child2)
           cross_over_helper(tl(tail), current)
         else
           current = List.insert_at(current, 0, head)
@@ -97,7 +97,7 @@ defmodule Genetic do
     first2 = String.slice(parent2, 0..rand)
     last2 = String.slice(parent2, rand+1..len)
 
-    [first1 <> last2, first2 <> last1]
+    {first1 <> last2, first2 <> last1}
   end
 
   def selection_process(population) do
