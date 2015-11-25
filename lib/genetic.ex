@@ -16,21 +16,17 @@ defmodule Genetic do
 
   def assess(chromosomes, target, threshold) do
     Parallel.pmap(chromosomes, fn(x) -> {x, fitness(x, target, threshold)} end)
-    |> Enum.into(%{})
   end
 
   def breed(_, _, _, max_generations \\ 200000)
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
     #Find elite of population
-    population = Enum.into(population, [])
     filtered_list = elite(population, 10)
-    best = Enum.into(elem(filtered_list, 0), %{})
-    the_rest = Enum.into(elem(filtered_list, 1), %{})
-    #Randomly crossover(80%) or mutate(20%) the rest
-    population = %{}
-    population = Map.merge(population, best)
-    population = Map.merge(population, handle_the_rest(the_rest, target, threshold))
+    best = elem(filtered_list, 0)
+    the_rest = elem(filtered_list, 1)
+    
+    population = best ++ handle_the_rest(the_rest, target, threshold)
     breed(population, target, threshold, max_generations-1)
   end
 
@@ -45,8 +41,8 @@ defmodule Genetic do
       end
     end)
     |> cross_over_helper |> assess(target, threshold)
-    Enum.into(processed, %{})
   end
+  
   def cross_over_helper(_, current \\ [])
   def cross_over_helper([head|tail], current) do
     random = :random.uniform(100)
@@ -70,7 +66,7 @@ defmodule Genetic do
   def elite(population, amount) do
     # Given a population, and an amount of chromosomes.
     # Return that many best chromosomes.
-    x = List.keysort(population, 1)
+    x = Enum.into(population, []) |> List.keysort(1)
     {Enum.slice(x, 0..amount-1), Enum.slice(x, amount..length(x)-1)}
   end
 
@@ -86,8 +82,6 @@ defmodule Genetic do
 
   def cross_over(parent1, parent2) do
     # Defines how genes are passed to next generation
-    #parent1 = elem(parent1, 0)
-    #parent2 = elem(parent2, 0)
     len = String.length(parent1)
     rand = :random.uniform(len)
 
@@ -141,7 +135,7 @@ defmodule Genetic do
   end
 end
 
-Genetic.start("Hello World", 100, 100)
+Genetic.start("Hello World", 100, 80)
 #Genetic.fitness("heRlo World", "Hello World",  100)
 #IO.puts Genetic.elite([{"test", 10}, {"testing", 5}, {"this", 15}, {"te", 1}, {"monkey", 3}], 3)
 
