@@ -18,14 +18,12 @@ defmodule Genetic do
   def breed(_, _, _, max_generations \\ 2000)
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
-    #Find elite of population
     filter_list(population, target, threshold) 
     |> breed(target, threshold, max_generations-1)
   end
   
   def filter_list(population, target, threshold) do
-    #div(length(population),50) |> IO.puts
-    filtered_list = elite(population, 10)
+    filtered_list = elite(population, 5)
     best = elem(filtered_list, 0)
     the_rest = elem(filtered_list, 1)
     
@@ -67,8 +65,6 @@ defmodule Genetic do
   def cross_over_helper([], result), do: result
 
   def elite(population, amount) do
-    # Given a population, and an amount of chromosomes.
-    # Return that many best chromosomes.
     x = List.keysort(population, 1)
     {Enum.slice(x, 0..amount-1), Enum.slice(x, amount..length(x)-1)}
   end
@@ -84,7 +80,6 @@ defmodule Genetic do
   end
 
   def cross_over(parent1, parent2) do
-    # Defines how genes are passed to next generation
     len = String.length(parent1)
     rand = :random.uniform(len)
 
@@ -103,7 +98,6 @@ defmodule Genetic do
     parent3 = Enum.random(population)
     parent4 = Enum.random(population)
 
-    # Return the two superior parents
     {select_fitter_mate(parent1, parent2), select_fitter_mate(parent3, parent4)}
   end
 
@@ -120,10 +114,8 @@ defmodule Genetic do
     x = fitness_helper(c,t)
     if x <= threshold do
       IO.puts("Found Chromosome: '#{chromosome}' with fitness #{x} that crosses theshold: #{threshold} for target: #{target}")
-      x
-    else
-      x
     end
+    x
   end
 
   def fitness_helper(_, _, score \\ 0)
