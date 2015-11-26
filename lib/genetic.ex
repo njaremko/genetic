@@ -6,7 +6,7 @@ defmodule Genetic do
     |> assess(target, threshold) # Assess the population
     |> breed(target, threshold) # Start recursive loop of generating generations.
   end
-  
+
   def generate_population(population, length) do
     for _chromosome <- 0..population, do: Random.string(length)
   end
@@ -19,18 +19,18 @@ defmodule Genetic do
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
     IO.puts 2000-max_generations
-    filter_list(population, target, threshold) 
+    filter_list(population, target, threshold)
     |> breed(target, threshold, max_generations-1)
   end
-  
+
   def filter_list(population, target, threshold) do
-    filtered_list = elite(population, 5)
+    filtered_list = elite(population, 10)
     best = elem(filtered_list, 0)
     the_rest = best ++ elem(filtered_list, 1)
-    
+
     handle_the_rest(the_rest, target, threshold) ++ best
   end
-  
+
   def handle_the_rest(population, target, threshold) do
     Parallel.pmap(population, fn(x) ->
       x = elem(x,0)
@@ -44,13 +44,13 @@ defmodule Genetic do
     |> cross_over_helper
     |> assess(target, threshold)
   end
-  
+
   def cross_over_helper(_, current \\ [])
   def cross_over_helper([head|tail], current) do
     random = :random.uniform(100)
       if random <= 80 do
         case tail do
-          [] -> 
+          [] ->
             current = List.insert_at(current, 0, head)
             cross_over_helper(tail, current)
           _  ->
