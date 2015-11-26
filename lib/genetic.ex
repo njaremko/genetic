@@ -18,6 +18,7 @@ defmodule Genetic do
   def breed(_, _, _, max_generations \\ 2000)
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
+    IO.puts 2000-max_generations
     filter_list(population, target, threshold) 
     |> breed(target, threshold, max_generations-1)
   end
@@ -25,7 +26,7 @@ defmodule Genetic do
   def filter_list(population, target, threshold) do
     filtered_list = elite(population, 5)
     best = elem(filtered_list, 0)
-    the_rest = elem(filtered_list, 1)
+    the_rest = best ++ elem(filtered_list, 1)
     
     handle_the_rest(the_rest, target, threshold) ++ best
   end
@@ -98,7 +99,7 @@ defmodule Genetic do
     parent3 = Enum.random(population)
     parent4 = Enum.random(population)
 
-    {select_fitter_mate(parent1, parent2), select_fitter_mate(parent3, parent4)}
+    [select_fitter_mate(parent1, parent2), select_fitter_mate(parent3, parent4)]
   end
 
   def mutate(input) do
@@ -114,6 +115,7 @@ defmodule Genetic do
     x = fitness_helper(c,t)
     if x <= threshold do
       IO.puts("Found Chromosome: '#{chromosome}' with fitness #{x} that crosses theshold: #{threshold} for target: #{target}")
+      System.halt(0)
     end
     x
   end
@@ -131,5 +133,5 @@ defmodule Genetic do
   end
 end
 
-Genetic.start("Hello World", 1000, 2)
+Genetic.start("Hello World", 1000, 0)
 
