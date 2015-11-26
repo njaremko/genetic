@@ -8,8 +8,7 @@ defmodule Genetic do
   end
   
   def generate_population(population, length) do
-    Enum.into(0..population, [])
-    |> Enum.map(fn(_x) -> Random.string(length) end)
+    for _chromosome <- 0..population, do: Random.string(length)
   end
 
   def assess(chromosomes, target, threshold) do
@@ -51,13 +50,14 @@ defmodule Genetic do
   def cross_over_helper([head|tail], current) do
     random = :random.uniform(100)
       if random <= 80 do
-        if tail != [] do
-          children = hd(List.insert_at(current, 0, cross_over(head, hd(tail))))
-          current = current ++ children
-          cross_over_helper(tl(tail), current)
-        else
-          current = List.insert_at(current, 0, head)
-          cross_over_helper(tail, current)
+        case tail do
+          [] -> 
+            current = List.insert_at(current, 0, head)
+            cross_over_helper(tail, current)
+          _  ->
+            children = hd(List.insert_at(current, 0, cross_over(head, hd(tail))))
+            current = current ++ children
+            cross_over_helper(tl(tail), current)
         end
       else
         current = List.insert_at(current, 0, head)
