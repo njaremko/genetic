@@ -107,7 +107,6 @@ defmodule Genetic do
     String.replace(input, String.at(input, random), Random.letter(), global: false)
   end
 
-  # Evaluate the fitness of the possible solution
   def fitness(chromosome, target, threshold) do
     c = String.codepoints(chromosome) |> Enum.with_index()
     t = String.codepoints(target) |> Enum.with_index()
