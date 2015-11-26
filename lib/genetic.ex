@@ -6,12 +6,10 @@ defmodule Genetic do
     |> assess(target, threshold) # Assess the population
     |> breed(target, threshold) # Start recursive loop of generating generations.
   end
-
-  def generate_population(_, _, current \\ [])
-  def generate_population(0, _, result), do: result
-  def generate_population(population, length, current) do
-    current = List.insert_at(current, 0, Random.string(length))
-    generate_population(population-1, length, current)
+  
+  def generate_population(population, length) do
+    Enum.into(0..population, [])
+    |> Enum.map(fn(_x) -> Random.string(length) end)
   end
 
   def assess(chromosomes, target, threshold) do
