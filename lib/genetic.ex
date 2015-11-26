@@ -66,7 +66,7 @@ defmodule Genetic do
   def elite(population, amount) do
     # Given a population, and an amount of chromosomes.
     # Return that many best chromosomes.
-    x = Enum.into(population, []) |> List.keysort(1)
+    x = List.keysort(population, 1)
     {Enum.slice(x, 0..amount-1), Enum.slice(x, amount..length(x)-1)}
   end
 
