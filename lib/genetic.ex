@@ -22,14 +22,18 @@ defmodule Genetic do
   def breed(population, _, _, 0), do: population
   def breed(population, target, threshold, max_generations) do
     #Find elite of population
+    filter_list(population, target, threshold) 
+    |> breed(target, threshold, max_generations-1)
+  end
+  
+  def filter_list(population, target, threshold) do
     filtered_list = elite(population, 10)
     best = elem(filtered_list, 0)
     the_rest = elem(filtered_list, 1)
     
-    population = best ++ handle_the_rest(the_rest, target, threshold)
-    breed(population, target, threshold, max_generations-1)
+    best ++ handle_the_rest(the_rest, target, threshold)
   end
-
+  
   def handle_the_rest(population, target, threshold) do
     Parallel.pmap(population, fn(x) ->
       x = elem(x,0)
@@ -40,7 +44,8 @@ defmodule Genetic do
         x
       end
     end)
-    |> cross_over_helper |> assess(target, threshold)
+    |> cross_over_helper
+    |> assess(target, threshold)
   end
   
   def cross_over_helper(_, current \\ [])
@@ -111,12 +116,13 @@ defmodule Genetic do
 
   # Evaluate the fitness of the possible solution
   def fitness(chromosome, target, threshold) do
-    c = Enum.with_index(String.codepoints(chromosome))
-    t = Enum.with_index(String.codepoints(target))
+    c = String.codepoints(chromosome) |> Enum.with_index()
+    t = String.codepoints(target) |> Enum.with_index()
 
     x = fitness_helper(c,t)
     if x <= threshold do
       IO.puts("Found Chromosome: '#{chromosome}' with fitness #{x} that crosses theshold: #{threshold} for target: #{target}")
+      x
     else
       x
     end
@@ -135,5 +141,5 @@ defmodule Genetic do
   end
 end
 
-Genetic.start("Hello World", 100, 50)
+Genetic.start("Hello World", 100, 40)
 
