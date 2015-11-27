@@ -24,11 +24,12 @@ defmodule Genetic do
   end
 
   def filter_list(population, target, threshold) do
-    filtered_list = elite(population, 10)
+    filtered_list = elite(population, div(length(population),10))
     best = elem(filtered_list, 0)
-    the_rest = best ++ elem(filtered_list, 1)
+    the_rest = elem(filtered_list, 1)
+    the_rest = best ++ Enum.slice(the_rest, 0, length(the_rest)-length(best))
 
-    handle_the_rest(the_rest, target, threshold) ++ best
+    best ++ handle_the_rest(the_rest, target, threshold)
   end
 
   def handle_the_rest(population, target, threshold) do
@@ -132,5 +133,5 @@ defmodule Genetic do
   end
 end
 
-Genetic.start("Hello World", 1000, 0)
+Genetic.start("Hello World", 5000, 0)
 
